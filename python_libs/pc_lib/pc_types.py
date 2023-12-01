@@ -1463,6 +1463,7 @@ class GeoNodeDimension(GeoNodeObject):
         if dist == 0:
             self.obj.hide_viewport = True
         elif dist <= pc_unit.inch(7):
+            self.set_input("Offset Text Amount",pc_unit.inch(3))
             self.set_input("Offset Text From Line",True)
         else:
             self.set_input("Offset Text From Line",False)

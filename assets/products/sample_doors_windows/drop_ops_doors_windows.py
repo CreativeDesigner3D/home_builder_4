@@ -248,7 +248,11 @@ class home_builder_OT_place_door_window(pc_snap.Drop_Operator):
         else:
             self.left_dim.obj.hide_viewport = True
             self.width_dim.obj.hide_viewport = True
-            self.right_dim.obj.hide_viewport = True         
+            self.right_dim.obj.hide_viewport = True    
+
+        self.left_dim.update()
+        self.right_dim.update()
+        self.width_dim.update()
 
     def refresh_data(self,hide=True):
         ''' For some reason matrix world doesn't evaluate correctly

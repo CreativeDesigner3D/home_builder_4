@@ -197,6 +197,7 @@ class pc_layout_view_OT_create_2d_plan_view(bpy.types.Operator):
         dim.obj.data.splines[0].bezier_points[1].co = (width,0,0)  
         dim.obj.location.z = z_loc
         dim.obj.location.y = y_loc
+        dim.set_input("Leader Length",pc_unit.inch(3))
         dim.update()
         return dim
 
