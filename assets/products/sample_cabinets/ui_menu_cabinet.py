@@ -7,7 +7,9 @@ def draw_layout_view_commands(self,context):
 
 
 def register():
-    bpy.types.VIEW3D_MT_layout_view_creation.append(draw_layout_view_commands)
+    pass
+    # bpy.types.VIEW3D_MT_layout_view_creation.append(draw_layout_view_commands)
 
 def unregister():    
-    bpy.types.VIEW3D_MT_layout_view_creation.remove(draw_layout_view_commands)
+    pass
+    # bpy.types.VIEW3D_MT_layout_view_creation.remove(draw_layout_view_commands)
