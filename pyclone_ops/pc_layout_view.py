@@ -435,6 +435,23 @@ class pc_layout_view_OT_setup_white_background(bpy.types.Operator):
         return {'FINISHED'}    
 
 
+class pc_layout_view_OT_hide_wall_returns(bpy.types.Operator):
+    bl_idname = "pc_layout_view.hide_wall_returns"
+    bl_label = "Hide Wall Returns"
+
+    def execute(self, context):
+        room = pc_types.Room(context.scene)
+        walls = room.get_walls()
+        for wall in walls:
+            la = wall.get_prompt("Left Angle")
+            if la:
+                la.set_value(0)
+            ra = wall.get_prompt("Right Angle")
+            if la:
+                ra.set_value(0)                
+        return {'FINISHED'} 
+
+
 class pc_layout_view_OT_toggle_dimension_mode(bpy.types.Operator):
     bl_idname = "pc_layout_view.toggle_dimension_mode"
     bl_label = "Toggle Dimension Mode"
@@ -1358,6 +1375,7 @@ classes = (
     pc_layout_view_OT_create_2d_plan_view,
     pc_layout_view_OT_create_2d_elevation_views,
     pc_layout_view_OT_setup_white_background,
+    pc_layout_view_OT_hide_wall_returns,
     pc_layout_view_OT_toggle_dimension_mode,
     pc_layout_view_OT_add_elevation_dimension,
     pc_layout_view_OT_draw_geo_node_dimension,
