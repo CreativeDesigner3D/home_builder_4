@@ -290,6 +290,13 @@ class pc_layout_view_OT_create_2d_elevation_views(bpy.types.Operator):
             if anno.name in collection.objects:
                 collection.objects.unlink(anno)
 
+    def get_annotations(self,collection,wall):
+        plan_annotations = []
+        for obj in collection.objects:
+            if 'IS_2D_ANNOTATION' in obj:
+                plan_annotations.append(obj)
+        return plan_annotations
+
     # def get_wall_cabinets(self,wall,loc_sort='X'):
     #     """ This returns a sorted list of all of the assemblies base points
     #         parented to the wall
@@ -349,10 +356,18 @@ class pc_layout_view_OT_create_2d_elevation_views(bpy.types.Operator):
                     if child.location.x <= pc_unit.inch(10):
                         self.link_children_with_collection(child,collection)
 
-        self.unlink_plan_view_annotations(collection,wall)
+        annotations = self.get_annotations(collection,wall)
+        for anno in annotations:
+            if anno.name in collection.objects:
+                collection.objects.unlink(anno)
+
+        # self.unlink_plan_view_annotations(collection,wall)
         bpy.ops.scene.new(type='EMPTY')
         layout = pc_types.Assembly_Layout(context.scene)
         layout.setup_assembly_layout()
+
+        for anno in annotations:
+            layout.dimension_collection.objects.link(anno)
 
         layout.scene.name = wall.obj_bp.name
         wall_view = layout.add_assembly_view(collection)
@@ -400,6 +415,25 @@ class pc_layout_view_OT_create_2d_elevation_views(bpy.types.Operator):
 
         return {'FINISHED'}
     
+
+class pc_layout_view_OT_setup_white_background(bpy.types.Operator):
+    bl_idname = "pc_layout_view.set_white_background"
+    bl_label = "Set White Background"
+
+    def execute(self, context):
+        context.scene.use_nodes = True
+        node_tree = context.scene.node_tree
+        render_layer_node = node_tree.nodes['Render Layers']
+        composite_node = node_tree.nodes['Composite']
+        alpha_node = node_tree.nodes.new("CompositorNodeAlphaOver")
+        render_layer_node.location = (0,0)
+        alpha_node.location = (300,0)
+        composite_node.location = (600,0)
+        alpha_node.premul = 1
+        node_tree.links.new(render_layer_node.outputs["Image"],alpha_node.inputs[2])
+        node_tree.links.new(alpha_node.outputs["Image"],composite_node.inputs[0])
+        return {'FINISHED'}    
+
 
 class pc_layout_view_OT_toggle_dimension_mode(bpy.types.Operator):
     bl_idname = "pc_layout_view.toggle_dimension_mode"
@@ -1323,6 +1357,7 @@ classes = (
     pc_layout_view_OT_create_3d_view,
     pc_layout_view_OT_create_2d_plan_view,
     pc_layout_view_OT_create_2d_elevation_views,
+    pc_layout_view_OT_setup_white_background,
     pc_layout_view_OT_toggle_dimension_mode,
     pc_layout_view_OT_add_elevation_dimension,
     pc_layout_view_OT_draw_geo_node_dimension,

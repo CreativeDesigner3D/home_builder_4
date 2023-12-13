@@ -85,6 +85,10 @@ class VIEW3D_PT_pc_layout_view(Panel):
             # row.label(text="Transparent Background") 
             row.prop(rd, "film_transparent", text="Transparent Background") 
 
+            row = box.row()
+            row.operator("pc_layout_view.set_white_background",text="Set White Background")
+            row.prop(scene, "use_nodes")
+
             box = layout.box()
             box.label(text='Camera Properties',icon='CAMERA_DATA')
             box.prop(view, "lock_camera")

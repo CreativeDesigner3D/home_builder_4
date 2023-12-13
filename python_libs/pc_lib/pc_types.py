@@ -1038,6 +1038,24 @@ class GeoNodeObject():
         else:
             self.coll = bpy.context.view_layer.active_layer_collection.collection
 
+    def get_geo_node(self,path,geo_node_name):
+        if geo_node_name in bpy.data.node_groups:
+            node = bpy.data.node_groups[geo_node_name]
+            cage = bpy.data.meshes.new(geo_node_name)
+            self.obj = bpy.data.objects.new(geo_node_name,cage)
+            self.mod = self.obj.modifiers.new('GeometryNodes','NODES')
+            self.mod.node_group = node
+        else:
+            with bpy.data.libraries.load(path) as (data_from, data_to):
+                data_to.objects = data_from.objects
+            for obj in data_to.objects:
+                self.obj = obj
+            self.obj.name = geo_node_name
+            for mod in self.obj.modifiers:
+                if mod.type == 'NODES':
+                    self.mod = mod
+                    break        
+
     def add_assembly(self,assembly):
         if assembly.obj_bp is None:
             if hasattr(assembly,'draw'):
@@ -1284,26 +1302,27 @@ class GeoNodeCage(GeoNodeObject):
             pc_utils.add_driver_variables(driver,variables)
             driver.driver.expression = expression
 
-
     def create(self,name=""):
         props = bpy.context.scene.pyclone
-        if self.geo_node_name in bpy.data.node_groups:
-            node = bpy.data.node_groups[self.geo_node_name]
-            cage = bpy.data.meshes.new(name)
-            self.obj = bpy.data.objects.new(name,cage)
-            self.mod = self.obj.modifiers.new('GeometryNodes','NODES')
-            self.mod.node_group = node
-        else:
-            PATH = os.path.join(os.path.dirname(__file__),'assets','GeoNodeObjects',self.geo_node_name + ".blend")
-            with bpy.data.libraries.load(PATH) as (data_from, data_to):
-                data_to.objects = data_from.objects
-            for obj in data_to.objects:
-                self.obj = obj
-            self.obj.name = name
-            for mod in self.obj.modifiers:
-                if mod.type == 'NODES':
-                    self.mod = mod
-                    break                      
+        path = os.path.join(os.path.dirname(__file__),'assets','GeoNodeObjects',self.geo_node_name + ".blend")
+        self.get_geo_node(path,self.geo_node_name)
+        # if self.geo_node_name in bpy.data.node_groups:
+        #     node = bpy.data.node_groups[self.geo_node_name]
+        #     cage = bpy.data.meshes.new(name)
+        #     self.obj = bpy.data.objects.new(name,cage)
+        #     self.mod = self.obj.modifiers.new('GeometryNodes','NODES')
+        #     self.mod.node_group = node
+        # else:
+        #     PATH = os.path.join(os.path.dirname(__file__),'assets','GeoNodeObjects',self.geo_node_name + ".blend")
+        #     with bpy.data.libraries.load(PATH) as (data_from, data_to):
+        #         data_to.objects = data_from.objects
+        #     for obj in data_to.objects:
+        #         self.obj = obj
+        #     self.obj.name = name
+        #     for mod in self.obj.modifiers:
+        #         if mod.type == 'NODES':
+        #             self.mod = mod
+        #             break                      
         self.obj.hide_render = True
         self.obj["GeoNodeName"] = self.geo_node_name
         self.mod.node_group.interface_update(bpy.context)
@@ -1364,22 +1383,24 @@ class GeoNodeCutpart(GeoNodeObject):
 
     def create(self,name=""):
         props = bpy.context.scene.pyclone
-        if self.geo_node_name in bpy.data.node_groups:
-            node = bpy.data.node_groups[self.geo_node_name]
-            cage = bpy.data.meshes.new(name)
-            self.obj = bpy.data.objects.new(name,cage)
-            self.mod = self.obj.modifiers.new('GeometryNodes','NODES')
-            self.mod.node_group = node
-        else:
-            PATH = os.path.join(os.path.dirname(__file__),'assets','GeoNodeObjects',self.geo_node_name + ".blend")
-            with bpy.data.libraries.load(PATH) as (data_from, data_to):
-                data_to.objects = data_from.objects
-            for obj in data_to.objects:
-                self.obj = obj
-            for mod in self.obj.modifiers:
-                if mod.type == 'NODES':
-                    self.mod = mod
-                    break                    
+        path = os.path.join(os.path.dirname(__file__),'assets','GeoNodeObjects',self.geo_node_name + ".blend")
+        self.get_geo_node(path,self.geo_node_name)        
+        # if self.geo_node_name in bpy.data.node_groups:
+        #     node = bpy.data.node_groups[self.geo_node_name]
+        #     cage = bpy.data.meshes.new(name)
+        #     self.obj = bpy.data.objects.new(name,cage)
+        #     self.mod = self.obj.modifiers.new('GeometryNodes','NODES')
+        #     self.mod.node_group = node
+        # else:
+        #     PATH = os.path.join(os.path.dirname(__file__),'assets','GeoNodeObjects',self.geo_node_name + ".blend")
+        #     with bpy.data.libraries.load(PATH) as (data_from, data_to):
+        #         data_to.objects = data_from.objects
+        #     for obj in data_to.objects:
+        #         self.obj = obj
+        #     for mod in self.obj.modifiers:
+        #         if mod.type == 'NODES':
+        #             self.mod = mod
+        #             break                    
         self.obj.name = name
         self.obj["GeoNodeName"] = self.geo_node_name
         # self.obj['PROMPT_ID'] = 'pc_layout_view.show_dimension_properties'
@@ -1432,7 +1453,8 @@ class GeoNodeDimension(GeoNodeObject):
                     break                  
         self.obj[self.geo_node_name] = True
         self.obj['PROMPT_ID'] = 'pc_layout_view.show_dimension_properties'
-        self.obj['MENU_ID'] = 'CWP_MT_dimension_commands'
+        self.obj['MENU_ID'] = 'HOME_BUILDER_MT_dimension_commands'
+        self.obj["IS_2D_ANNOTATION"] = True
         if self.coll:
             self.coll.objects.link(self.obj)
         else:

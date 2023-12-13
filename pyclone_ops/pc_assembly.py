@@ -242,7 +242,7 @@ class pc_assembly_OT_add_object(Operator):
                                         items=[('MESH',"Mesh","Add an Mesh Object"),
                                                ('EMPTY',"Empty","Add an Empty Object"),
                                                ('CURVE',"Curve","Add an Curve Object"),
-                                               ('GEONODE_PART',"Geo Node Part","Add an Geo Node Object"),
+                                               ('GEONODE_PART',"Cut Part","Add an Geo Node Cut Part Object"),
                                                ('LIGHT',"Light","Add an Light Object")],
                                         default='MESH')
     @classmethod
@@ -281,7 +281,7 @@ class pc_assembly_OT_add_object(Operator):
         if self.object_type == 'LIGHT':
             assembly.add_light(self.object_name,'POINT')
         if self.object_type == 'GEONODE_PART':
-            obj = assembly.create_geo_part(self.object_name)
+            obj = assembly.add_geo_node_cutpart(self.object_name)
 
     def add_object_to_cage(self,context,cage):
         if self.object_type == 'EMPTY':

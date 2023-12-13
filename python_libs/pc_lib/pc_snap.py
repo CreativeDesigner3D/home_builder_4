@@ -596,7 +596,10 @@ class Drop_Operator(bpy.types.Operator):
                                 cage_depth = 0
                             #IF ASSEMBLY IS CLOSE ENOUGH TO END OF WALL
                             if (cage.obj.location.x + cage.get_input("Dim X")) > left_wall.obj_x.location.x - cage_depth:
-                                found_left_x = cage_depth
+                                if int(math.degrees(cage.obj.rotation_euler.z)) == 0:
+                                    found_left_x = cage_depth
+                                else:
+                                    found_left_x = cage.get_input("Dim X")
                                 left_cage = cage
                                 break
 
@@ -654,12 +657,22 @@ class Drop_Operator(bpy.types.Operator):
                                 cage_depth = 0                            
                             #IF ASSEMBLY IS CLOSE ENOUGH TO START OF WALL
                             if cage.obj.location.x < cage_depth:
-                                found_right_x = wall_length - cage_depth
+                                found_right_x = wall_length - cage.get_input("Dim Y")
                                 right_cage = cage
                                 break
             cal_right_x_snap = found_right_x
 
         return cal_right_x_snap, right_cage
+
+    def event_is_place_asset(self,event):
+        if event.type == 'LEFTMOUSE' and event.value == 'PRESS':
+            return True
+        elif event.type == 'NUMPAD_ENTER' and event.value == 'PRESS':
+            return True
+        elif event.type == 'RET' and event.value == 'PRESS':
+            return True
+        else:
+            return False
 
     def cancel_drop(self,context,obj_bp):
         pc_utils.delete_object_and_children(obj_bp)

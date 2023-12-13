@@ -6,28 +6,17 @@ from .. import pyclone_utils
 def draw_object_transform(context,layout,obj):
     if obj.type not in {'EMPTY','CAMERA','LIGHT'}:
         if 'GeoNodeName' in obj:
-
-            geo_object = eval('pc_types.' + obj['GeoNodeName'] + "(obj)")
-            # geo_object = pc_types.GeoNodeCutpart(obj)
-            # print('geo',geo_object,obj['GeoNodeName'])
-            if hasattr(geo_object,"draw_interface"):
-                geo_object.draw_interface(layout)
-            # for mod in obj.modifiers:
-            #     if mod.type == 'NODES':
-            #         node = mod.node_group
-            #         col = layout.column(align=True)
-            #         col.label(text="Dimensions:")
-            #         row = col.row(align=True)
-            #         row.prop(mod,'["Input_2"]',text="Length")
-            #         row.prop(mod,'["Input_5"]',text="",icon='MOD_MIRROR')
-
-            #         row = col.row(align=True)
-            #         row.prop(mod,'["Input_3"]',text="Width")
-            #         row.prop(mod,'["Input_6"]',text="",icon='MOD_MIRROR')
-
-            #         row = col.row(align=True)
-            #         row.prop(mod,'["Input_4"]',text="Thickness")
-            #         row.prop(mod,'["Input_7"]',text="",icon='MOD_MIRROR')
+            if hasattr(pc_types,obj['GeoNodeName']):
+                geo_object = eval('pc_types.' + obj['GeoNodeName'] + "(obj)")
+                if hasattr(geo_object,"draw_interface"):
+                    geo_object.draw_interface(layout)
+            else:
+                for mod in obj.modifiers:
+                    if mod.type == 'NODES':
+                        node = mod.node_group
+                        for n_input in node.interface.items_tree:
+                            if n_input.identifier in mod:
+                                layout.prop(mod,'["' + n_input.identifier + '"]',text=n_input.name)
 
         else:
             if obj.scale.x != 1 or obj.scale.y != 1 or obj.scale.z != 1:
