@@ -1234,8 +1234,6 @@ class GeoNodeObject():
             node_input = self.mod.node_group.interface.items_tree[name]    
             self.mod.node_group.interface_update(bpy.context)
             if hasattr(node_input,'subtype'):
-            #     print("SETTING INPUT",name,node_input.socket_type,node_input.subtype)
-            #     node_input.socket_type = node_input.socket_type
                 node_input.subtype = node_input.subtype            
             exec('self.mod["' + node_input.identifier + '"] = value')    
 
@@ -1305,28 +1303,10 @@ class GeoNodeCage(GeoNodeObject):
     def create(self,name=""):
         props = bpy.context.scene.pyclone
         path = os.path.join(os.path.dirname(__file__),'assets','GeoNodeObjects',self.geo_node_name + ".blend")
-        self.get_geo_node(path,self.geo_node_name)
-        # if self.geo_node_name in bpy.data.node_groups:
-        #     node = bpy.data.node_groups[self.geo_node_name]
-        #     cage = bpy.data.meshes.new(name)
-        #     self.obj = bpy.data.objects.new(name,cage)
-        #     self.mod = self.obj.modifiers.new('GeometryNodes','NODES')
-        #     self.mod.node_group = node
-        # else:
-        #     PATH = os.path.join(os.path.dirname(__file__),'assets','GeoNodeObjects',self.geo_node_name + ".blend")
-        #     with bpy.data.libraries.load(PATH) as (data_from, data_to):
-        #         data_to.objects = data_from.objects
-        #     for obj in data_to.objects:
-        #         self.obj = obj
-        #     self.obj.name = name
-        #     for mod in self.obj.modifiers:
-        #         if mod.type == 'NODES':
-        #             self.mod = mod
-        #             break                      
+        self.get_geo_node(path,self.geo_node_name)            
         self.obj.hide_render = True
         self.obj["GeoNodeName"] = self.geo_node_name
         self.mod.node_group.interface_update(bpy.context)
-        # self.mod.node_group.update()
         # self.obj['PROMPT_ID'] = 'pc_layout_view.show_dimension_properties'
         # self.obj['MENU_ID'] = 'CWP_MT_dimension_commands'
         if self.coll:
@@ -1384,23 +1364,7 @@ class GeoNodeCutpart(GeoNodeObject):
     def create(self,name=""):
         props = bpy.context.scene.pyclone
         path = os.path.join(os.path.dirname(__file__),'assets','GeoNodeObjects',self.geo_node_name + ".blend")
-        self.get_geo_node(path,self.geo_node_name)        
-        # if self.geo_node_name in bpy.data.node_groups:
-        #     node = bpy.data.node_groups[self.geo_node_name]
-        #     cage = bpy.data.meshes.new(name)
-        #     self.obj = bpy.data.objects.new(name,cage)
-        #     self.mod = self.obj.modifiers.new('GeometryNodes','NODES')
-        #     self.mod.node_group = node
-        # else:
-        #     PATH = os.path.join(os.path.dirname(__file__),'assets','GeoNodeObjects',self.geo_node_name + ".blend")
-        #     with bpy.data.libraries.load(PATH) as (data_from, data_to):
-        #         data_to.objects = data_from.objects
-        #     for obj in data_to.objects:
-        #         self.obj = obj
-        #     for mod in self.obj.modifiers:
-        #         if mod.type == 'NODES':
-        #             self.mod = mod
-        #             break                    
+        self.get_geo_node(path,self.geo_node_name)                
         self.obj.name = name
         self.obj["GeoNodeName"] = self.geo_node_name
         # self.obj['PROMPT_ID'] = 'pc_layout_view.show_dimension_properties'
@@ -1432,7 +1396,8 @@ class GeoNodeDimension(GeoNodeObject):
 
     def create(self,layout_view=None):
         mat = pc_utils.get_dimension_material()
-        props = bpy.context.scene.pyclone
+        scene = bpy.context.scene
+        props = scene.pyclone
         if self.geo_node_name in bpy.data.node_groups:
             node = bpy.data.node_groups[self.geo_node_name]
             curve = bpy.data.curves.new('Dimension','CURVE')
@@ -1466,6 +1431,7 @@ class GeoNodeDimension(GeoNodeObject):
         self.set_input('Arrow Height',props.arrow_height)
         self.set_input('Arrow Length',props.arrow_length)
         self.set_input('Line Thickness',props.line_thickness)
+        self.set_input('Metric',True if scene.unit_settings.system == 'METRIC' else False)
         self.set_input('Material',mat)
         self.set_curve_to_vector(bpy.context)
 

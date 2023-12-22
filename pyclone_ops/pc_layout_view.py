@@ -981,6 +981,8 @@ class pc_layout_view_OT_show_dimension_properties(Operator):
 
     flip_text: BoolProperty(name="Flip Text")
 
+    is_metric: BoolProperty(name="Is Metric")
+
     dimension = None
 
     def execute(self, context):
@@ -1023,6 +1025,7 @@ class pc_layout_view_OT_show_dimension_properties(Operator):
         self.dimension.set_input('Flip Arrows',self.flip_arrows) 
         self.dimension.set_input('Flip Text',self.flip_text) 
         self.dimension.set_input('Decimals',self.decimals)
+        self.dimension.set_input('Metric',self.is_metric)
         context.area.tag_redraw()
         return True
 
@@ -1039,6 +1042,7 @@ class pc_layout_view_OT_show_dimension_properties(Operator):
         self.offset_text_amount = self.dimension.get_input("Offset Text Amount")
         self.flip_arrows = self.dimension.get_input("Flip Arrows")
         self.decimals = self.dimension.get_input("Decimals")
+        self.is_metric = self.dimension.get_input("Metric")
         wm = context.window_manager
         return wm.invoke_props_dialog(self, width=400)
 
@@ -1078,6 +1082,9 @@ class pc_layout_view_OT_show_dimension_properties(Operator):
         row.label(text="Extend Line Amount")        
         row.prop(self,'extend_line_amount',text="")
         box.prop(self,'align_text_to_curve')
+        row = box.row()
+        row.label(text="Is Metric")        
+        row.prop(self,'is_metric',text="")
 
         box = layout.box()
         row = box.row()
