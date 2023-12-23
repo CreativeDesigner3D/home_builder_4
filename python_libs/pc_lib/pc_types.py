@@ -680,9 +680,88 @@ class Assembly:
 
 class Wall(Assembly):
 
-    def __init__(self,obj_bp):
+    def __init__(self,obj_bp=None):
         super().__init__(obj_bp=obj_bp)  
     
+    def draw_wall(self,wall_length,wall_height,wall_thickness):
+        self.create_assembly("Wall Mesh")
+
+        #ASSIGN PROPERTY
+        self.obj_bp["IS_WALL_BP"] = True
+        self.obj_bp["PROMPT_ID"] = "home_builder.wall_prompts" 
+        self.obj_bp["MENU_ID"] = "HOME_BUILDER_MT_wall_commands"
+
+        #Set Default Dimensions
+        self.obj_x.location.x = wall_length
+        self.obj_y.location.y = wall_thickness
+        self.obj_z.location.z = wall_height
+
+        #Add Objects
+        left_angle_empty = self.add_empty("Left Angle")
+        right_angle_empty = self.add_empty("Right Angle")
+
+        size = (0,0,0)
+        obj_mesh = pc_utils.create_cube_mesh("Wall Mesh",size)
+        obj_mesh.color = [0.252832, 0.500434, 0.735662, 1.000000]
+        obj_mesh['IS_WALL_MESH'] = True
+        self.add_object(obj_mesh)
+
+        #Assign Mesh Hooks
+        vgroup = obj_mesh.vertex_groups[left_angle_empty.name]
+        vgroup.add([1,5],1,'ADD')  
+
+        vgroup = obj_mesh.vertex_groups[right_angle_empty.name]
+        vgroup.add([2,6],1,'ADD')
+
+        vgroup = obj_mesh.vertex_groups[self.obj_x.name]
+        vgroup.add([3,7],1,'ADD')        
+
+        vgroup = obj_mesh.vertex_groups[self.obj_z.name]
+        vgroup.add([4,5,6,7],1,'ADD')        
+
+        hook = obj_mesh.modifiers.new('XHOOK','HOOK')
+        hook.object = self.obj_x
+        hook.vertex_indices_set([3,7])
+
+        hook = obj_mesh.modifiers.new('LEFTANGLE','HOOK')
+        hook.object = left_angle_empty
+        hook.vertex_indices_set([1,5])
+
+        hook = obj_mesh.modifiers.new('RIGHTANGLE','HOOK')
+        hook.object = right_angle_empty
+        hook.vertex_indices_set([2,6])        
+
+        hook = obj_mesh.modifiers.new('ZHOOK','HOOK')
+        hook.object = self.obj_z
+        hook.vertex_indices_set([4,5,6,7])
+
+        #Assign Drivers
+        length = self.obj_x.pyclone.get_var('location.x','length')
+        wall_thickness_var = self.obj_y.pyclone.get_var('location.y','wall_thickness_var')
+
+        left_angle = self.add_prompt("Left Angle",'ANGLE',0)
+        right_angle = self.add_prompt("Right Angle",'ANGLE',0)
+
+        left_angle_var = left_angle.get_var('left_angle_var')
+        right_angle_var = right_angle.get_var('right_angle_var')
+
+        left_angle_empty.pyclone.loc_x('tan(left_angle_var)*wall_thickness_var',[left_angle_var,wall_thickness_var])
+        left_angle_empty.pyclone.loc_y('wall_thickness_var',[wall_thickness_var])
+
+        right_angle_empty.pyclone.loc_x('length+tan(right_angle_var)*wall_thickness_var',[length,right_angle_var,wall_thickness_var])
+        right_angle_empty.pyclone.loc_y('wall_thickness_var',[wall_thickness_var])
+
+        #Add Material Pointer
+        bpy.context.view_layer.objects.active = obj_mesh
+        bpy.ops.object.material_slot_add()
+        pointer = obj_mesh.pyclone.pointers.add()
+        pointer.name = "Wall"
+        pointer.pointer_name = "Walls"
+
+        # obj_mesh.lock_location = (True,True,True)
+        # obj_mesh.lock_rotation = (True,True,True)
+        pc_utils.assign_materials_to_object(obj_mesh)
+
     def get_wall_assembly_bps_by_tag(self,tag,loc_sort='X'):
         """ This returns a sorted list of all of the assemblies base points
             parented to the wall

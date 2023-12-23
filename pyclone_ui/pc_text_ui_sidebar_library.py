@@ -44,6 +44,7 @@ class TEXT_PT_pc_examples(Panel):
         TEMPLATE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)),'docs','python_templates','PyClone Examples')
         layout.operator('text.open',text="Assembly Creation").filepath = os.path.join(TEMPLATE_PATH,"assembly_creation.py")
         layout.operator('text.open',text="Assembly Export").filepath = os.path.join(TEMPLATE_PATH,"assembly_export.py")
+        layout.operator('text.open',text="Home Builder Automation").filepath = os.path.join(TEMPLATE_PATH,"home_builder_automation.py")
 
 classes = (
     TEXT_PT_python_crash_course,
