@@ -316,6 +316,10 @@ class pc_assembly_OT_add_object(Operator):
             cage.add_light(self.object_name,'POINT')
         if self.object_type == 'GEONODE_PART':
             obj = cage.add_geo_node_cutpart(self.object_name)
+            obj.set_input("Length",pc_unit.inch(34))
+            obj.set_input("Width",pc_unit.inch(23))
+            obj.set_input("Thickness",pc_unit.inch(.75))
+            obj.set_input("Mirror X",False)
 
     def execute(self, context):
         if context.object and 'GeoNodeName' in context.object:
