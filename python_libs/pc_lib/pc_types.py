@@ -1336,6 +1336,10 @@ class GeoNodeObject():
         if name in self.obj.pyclone.calculators:
             return self.obj.pyclone.calculators[name]
         
+def get_geo_node_cage(obj):
+    if 'GeoNodeName' in obj and obj['GeoNodeName'] == 'GeoNodeCage':
+        return GeoNodeCage(obj)
+
 class GeoNodeCage(GeoNodeObject):
 
     geo_node_name = "GeoNodeCage"
