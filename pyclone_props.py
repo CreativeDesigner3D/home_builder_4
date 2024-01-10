@@ -146,6 +146,9 @@ class Prompt(PropertyGroup):
         if self.prompt_type == 'TEXT':
             return self.text_value
 
+    def get_combobox_value(self):
+        return self.combobox_items[self.combobox_index].name
+    
     def set_value(self,value):
         self.id_data.hide_viewport = False
         if self.prompt_type == 'FLOAT':
@@ -413,6 +416,13 @@ class PC_Object_Props(PropertyGroup):
         if prompt_name in self.prompts:
             return self.prompts[prompt_name]
 
+    def add_dummy_variable(self,parent):
+        for driver in self.id_data.animation_data.drivers:
+            dummy_var = driver.driver.variables.new()
+            dummy_var.name = 'DUMMY_VAR'
+            dummy_var.type = 'TRANSFORMS'
+            dummy_var.targets[0].id = parent
+
     def modifier(self,modifier,property_name,index=-1,expression="",variables=[]):
         driver = modifier.driver_add(property_name,index)
         add_driver_variables(driver,variables)
@@ -471,6 +481,30 @@ class PC_Object_Props(PropertyGroup):
             self.id_data.rotation_euler.z = value        
             return
         driver = self.id_data.driver_add('rotation_euler',2)
+        add_driver_variables(driver,variables)
+        driver.driver.expression = expression
+
+    def scale_x(self,expression="",variables=[],value=0):
+        if expression == "":
+            self.id_data.scale.x = value
+            return
+        driver = self.id_data.driver_add('scale',0)
+        add_driver_variables(driver,variables)
+        driver.driver.expression = expression
+
+    def scale_y(self,expression="",variables=[],value=0):
+        if expression == "":
+            self.id_data.scale.y = value        
+            return
+        driver = self.id_data.driver_add('scale',1)
+        add_driver_variables(driver,variables)
+        driver.driver.expression = expression
+
+    def scale_z(self,expression="",variables=[],value=0):
+        if expression == "":
+            self.id_data.scale.z = value        
+            return
+        driver = self.id_data.driver_add('scale',2)
         add_driver_variables(driver,variables)
         driver.driver.expression = expression
 
