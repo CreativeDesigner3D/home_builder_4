@@ -639,6 +639,7 @@ class hb_sample_cabinets_OT_place_cabinet_on_wall(bpy.types.Operator):
     qty_cage = None
     wall = None
 
+    snap_line = None
     width_dim = None
     left_dim = None
     center_left_dim = None
@@ -648,12 +649,18 @@ class hb_sample_cabinets_OT_place_cabinet_on_wall(bpy.types.Operator):
     def __del__(self):
         if self.qty_cage and self.qty_cage.obj_bp:
             pc_utils.delete_object_and_children(self.qty_cage.obj_bp)  
-        pc_utils.delete_object_and_children(self.width_dim.obj) 
-        pc_utils.delete_object_and_children(self.left_dim.obj) 
-        pc_utils.delete_object_and_children(self.center_left_dim.obj) 
-        pc_utils.delete_object_and_children(self.right_dim.obj) 
-        pc_utils.delete_object_and_children(self.center_right_dim.obj) 
-        pc_utils.delete_object_and_children(self.snap_line) 
+        if self.width_dim:
+            pc_utils.delete_object_and_children(self.width_dim.obj) 
+        if self.left_dim:
+            pc_utils.delete_object_and_children(self.left_dim.obj) 
+        if self.center_left_dim:
+            pc_utils.delete_object_and_children(self.center_left_dim.obj) 
+        if self.right_dim:
+            pc_utils.delete_object_and_children(self.right_dim.obj) 
+        if self.center_right_dim:
+            pc_utils.delete_object_and_children(self.center_right_dim.obj) 
+        if self.snap_line:
+            pc_utils.delete_object_and_children(self.snap_line) 
 
     @classmethod
     def poll(cls, context):
