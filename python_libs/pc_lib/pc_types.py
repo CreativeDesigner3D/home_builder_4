@@ -617,6 +617,13 @@ class Assembly:
     def get_loc_z_var(self,var_name):
         return self.obj_bp.pyclone.get_var("location.z",var_name)
 
+    def add_dummy_variable(self,parent):
+        for driver in self.obj_x.animation_data.drivers:
+            dummy_var = driver.driver.variables.new()
+            dummy_var.name = 'DUMMY_VAR'
+            dummy_var.type = 'TRANSFORMS'
+            dummy_var.targets[0].id = parent
+
     def hide(self,expression="",variables=[],value=0):
         hide = self.get_prompt("Hide")
         if expression == "":
@@ -1143,6 +1150,13 @@ class GeoNodeObject():
         assembly.obj_bp.parent = self.obj
         return assembly
 
+    def add_dummy_variable(self,parent):
+        for driver in self.obj.animation_data.drivers:
+            dummy_var = driver.driver.variables.new()
+            dummy_var.name = 'DUMMY_VAR'
+            dummy_var.type = 'TRANSFORMS'
+            dummy_var.targets[0].id = parent
+
     def add_assembly_from_file(self,filepath):
         with bpy.data.libraries.load(filepath) as (data_from, data_to):
             data_to.objects = data_from.objects
@@ -1336,9 +1350,7 @@ class GeoNodeObject():
         if name in self.obj.pyclone.calculators:
             return self.obj.pyclone.calculators[name]
         
-def get_geo_node_cage(obj):
-    if 'GeoNodeName' in obj and obj['GeoNodeName'] == 'GeoNodeCage':
-        return GeoNodeCage(obj)
+
 
 class GeoNodeCage(GeoNodeObject):
 
@@ -1386,10 +1398,12 @@ class GeoNodeCage(GeoNodeObject):
     def create(self,name=""):
         props = bpy.context.scene.pyclone
         path = os.path.join(os.path.dirname(__file__),'assets','GeoNodeObjects',self.geo_node_name + ".blend")
-        self.get_geo_node(path,self.geo_node_name)            
+        self.get_geo_node(path,self.geo_node_name)                
+        self.obj.name = name
         self.obj.hide_render = True
         self.obj["GeoNodeName"] = self.geo_node_name
         self.mod.node_group.interface_update(bpy.context)
+        # self.mod.node_group.update()
         # self.obj['PROMPT_ID'] = 'pc_layout_view.show_dimension_properties'
         # self.obj['MENU_ID'] = 'CWP_MT_dimension_commands'
         if self.coll:
@@ -1447,7 +1461,7 @@ class GeoNodeCutpart(GeoNodeObject):
     def create(self,name=""):
         props = bpy.context.scene.pyclone
         path = os.path.join(os.path.dirname(__file__),'assets','GeoNodeObjects',self.geo_node_name + ".blend")
-        self.get_geo_node(path,self.geo_node_name)                
+        self.get_geo_node(path,self.geo_node_name)                        
         self.obj.name = name
         self.obj["GeoNodeName"] = self.geo_node_name
         # self.obj['PROMPT_ID'] = 'pc_layout_view.show_dimension_properties'
@@ -1480,7 +1494,7 @@ class GeoNodeDimension(GeoNodeObject):
     def create(self,layout_view=None):
         mat = pc_utils.get_dimension_material()
         scene = bpy.context.scene
-        props = scene.pyclone
+        props = scene.pyclone        
         if self.geo_node_name in bpy.data.node_groups:
             node = bpy.data.node_groups[self.geo_node_name]
             curve = bpy.data.curves.new('Dimension','CURVE')
