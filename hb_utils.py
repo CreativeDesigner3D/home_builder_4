@@ -168,6 +168,22 @@ def load_libraries(context):
     prefs = context.preferences
     asset_lib = prefs.filepaths.asset_libraries.get("home_builder_library")
 
+    exclude_libraries = []
+
+    xml_file = hb_paths.get_library_path_xml()
+    if os.path.exists(xml_file):
+        root = ET.parse(xml_file).getroot()
+        for node in root:
+            if "LibraryPaths" in node.tag:
+                for c_node in node:
+                    if "BuiltInLibraries" in c_node.tag:
+                        for nc_node in c_node:
+                            if "Library" in nc_node.tag:
+                                for nnc_node in nc_node:
+                                    if "Enabled" in nnc_node.tag:
+                                        if nnc_node.text == "False":
+                                            exclude_libraries.append(nc_node.attrib["Name"])
+
     if not asset_lib:
         bpy.ops.preferences.asset_library_add()
         asset_lib = prefs.filepaths.asset_libraries[-1]
@@ -190,6 +206,10 @@ def load_libraries(context):
     load_library_from_path(context,hb_paths.get_build_library_path(),'BUILD_LIBRARY',None)
     load_library_from_path(context,hb_paths.get_decoration_library_path(),'DECORATIONS',None)
     load_library_from_path(context,hb_paths.get_material_library_path(),'MATERIALS',None)
+
+    for lib in wm_props.asset_libraries:
+        if lib.name in exclude_libraries:
+            lib.enabled = False  
 
     #LOAD EXTERNAL LIBRARIES
     for library_package in wm_props.library_packages:

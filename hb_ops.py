@@ -342,6 +342,12 @@ class home_builder_OT_update_library_xml(bpy.types.Operator):
         xml = pc_types.HB_XML()
         root = xml.create_tree()
         paths = xml.add_element(root,'LibraryPaths')
+        built_in_libraries = xml.add_element(paths,'BuiltInLibraries')
+        for lib in wm_props.asset_libraries:
+            if lib.is_external_library == False:
+                lib_package = xml.add_element(built_in_libraries,'Library',lib.name)
+                xml.add_element_with_text(lib_package,'Enabled',str(lib.enabled))
+
         packages = xml.add_element(paths,'Packages')
         for ex_lib in wm_props.library_packages:
             if os.path.exists(ex_lib.package_path):
