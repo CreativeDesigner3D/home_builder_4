@@ -600,7 +600,7 @@ def update_left_right_x(self,context):
 
 class hb_sample_cabinets_OT_place_cabinet_on_wall(bpy.types.Operator):
     bl_idname = "hb_sample_cabinets.place_cabinet_on_wall"
-    bl_label = "Place Wall Cabinet"
+    bl_label = "Place Cabinet on Wall"
 
     cabinet_bp_name: bpy.props.StringProperty(name="Cabinet Name",default="")
 
@@ -748,10 +748,17 @@ class hb_sample_cabinets_OT_place_cabinet_on_wall(bpy.types.Operator):
     def select_obj_and_children(self,obj):
         obj.hide_viewport = False
         obj.select_set(True)
-        for child in obj.children:
-            obj.hide_viewport = False
+        for child in obj.children_recursive:
+            if child.animation_data:
+                for driver in child.animation_data.drivers:
+                    driver.mute = True              
+            child.hide_viewport = False
             child.select_set(True)
-            self.select_obj_and_children(child)
+
+    def unmute_drivers(self,obj):
+        if obj.animation_data:
+            for driver in obj.animation_data.drivers:
+                driver.mute = False
 
     def hide_empties_and_boolean_meshes(self,obj):
         if 'IS_OPENING_MESH' not in obj:
@@ -763,10 +770,12 @@ class hb_sample_cabinets_OT_place_cabinet_on_wall(bpy.types.Operator):
     def copy_cabinet(self,context,cabinet):
         bpy.ops.object.select_all(action='DESELECT')
         self.select_obj_and_children(cabinet.obj_bp)
-        bpy.ops.object.duplicate_move()
-        obj = context.active_object
-        cabinet_bp = pc_utils.get_bp_by_tag(obj,const.CABINET_TAG)
-        return pc_types.Assembly(cabinet_bp)
+        bpy.ops.object.duplicate()
+        return cabinet
+        # obj = bpy.context.active_object
+        # print("OBJ",obj)
+        # cabinet_bp = pc_utils.get_bp_by_tag(obj,const.CABINET_TAG)
+        # return pc_types.Assembly(cabinet_bp)
 
     def check(self, context):
         offsets = self.left_offset + self.right_offset
@@ -866,7 +875,11 @@ class hb_sample_cabinets_OT_place_cabinet_on_wall(bpy.types.Operator):
         pc_utils.delete_object_and_children(self.right_dim.obj) 
         pc_utils.delete_object_and_children(self.center_right_dim.obj) 
         pc_utils.delete_object_and_children(self.center_left_dim.obj) 
-        # pc_utils.delete_object_and_children(self.snap_line) 
+        
+        for child in self.wall.obj_bp.children_recursive:
+            self.unmute_drivers(child)
+            if child.type == 'EMPTY':
+                child.hide_viewport = True
         return {'FINISHED'}
 
     def get_calculators(self,obj):
