@@ -150,19 +150,13 @@ def load_libraries_from_xml(context):
     if os.path.exists(xml_file):
         root = ET.parse(xml_file).getroot()
         for node in root:
-            if "LibraryPaths" in node.tag:
-                for c_node in node:
-                    if "Packages" in c_node.tag:
-                        for nc_node in c_node:
-                            if "Package" in nc_node.tag:
-                                path = nc_node.attrib["Name"]
-                                if os.path.exists(path):
-                                    lib = wm_props.library_packages.add()
-                                    lib.name = path
-                                    lib.package_path = path
-                                    for nnc_node in nc_node:
-                                        if "Enabled" in nnc_node.tag:
-                                            lib.enabled = True if nnc_node.text == "True" else False
+            for node in root.findall("./LibraryPaths/Packages/Package"):
+                path = node.attrib["Name"]
+                if os.path.exists(path):
+                    lib = wm_props.library_packages.add()
+                    lib.name = path
+                    lib.package_path = path
+                    lib.enabled = True if node.find("./Enabled").text == "True" else False
 
 def load_libraries(context):
     prefs = context.preferences
@@ -171,18 +165,11 @@ def load_libraries(context):
     exclude_libraries = []
 
     xml_file = hb_paths.get_library_path_xml()
+
     if os.path.exists(xml_file):
         root = ET.parse(xml_file).getroot()
-        for node in root:
-            if "LibraryPaths" in node.tag:
-                for c_node in node:
-                    if "BuiltInLibraries" in c_node.tag:
-                        for nc_node in c_node:
-                            if "Library" in nc_node.tag:
-                                for nnc_node in nc_node:
-                                    if "Enabled" in nnc_node.tag:
-                                        if nnc_node.text == "False":
-                                            exclude_libraries.append(nc_node.attrib["Name"])
+        for node in root.findall("./LibraryPaths/BuiltInLibraries/Library/Enabled[.='False']/../[@Name]"):
+            exclude_libraries.append(node.attrib["Name"])
 
     if not asset_lib:
         bpy.ops.preferences.asset_library_add()
