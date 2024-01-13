@@ -149,14 +149,13 @@ def load_libraries_from_xml(context):
     xml_file = hb_paths.get_library_path_xml()
     if os.path.exists(xml_file):
         root = ET.parse(xml_file).getroot()
-        for node in root:
-            for node in root.findall("./LibraryPaths/Packages/Package"):
-                path = node.attrib["Name"]
-                if os.path.exists(path):
-                    lib = wm_props.library_packages.add()
-                    lib.name = path
-                    lib.package_path = path
-                    lib.enabled = True if node.find("./Enabled").text == "True" else False
+        for node in root.findall("./LibraryPaths/Packages/Package"):
+            path = node.attrib["Name"]
+            if os.path.exists(path):
+                lib = wm_props.library_packages.add()
+                lib.name = path
+                lib.package_path = path
+                lib.enabled = True if node.find("./Enabled").text == "True" else False
 
 def load_libraries(context):
     prefs = context.preferences
