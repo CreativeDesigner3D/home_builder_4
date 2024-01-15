@@ -398,14 +398,15 @@ class home_builder_OT_draw_multiple_walls(pc_snap.Drop_Operator):
         if self.typed_value == "":
             self.current_wall.obj_x.location.x = math.fabs(length)
         else:
-            if self.typed_value == ".":
-                value = 0
-            else:
-                value = eval(self.typed_value)
             if bpy.context.scene.unit_settings.system == 'METRIC':
+                if self.typed_value == ".":
+                    value = 0
+                else:
+                    value = eval(self.typed_value)
                 self.current_wall.obj_x.location.x = pc_unit.millimeter(float(value))
             else:
-                self.current_wall.obj_x.location.x = pc_unit.inch(float(value))     
+                feet, inches = pc_unit.parse_feet_and_inches(self.typed_value)
+                self.current_wall.obj_x.location.x = pc_unit.inch(feet * 12 + inches)
 
     def get_snap_location(self,selected_point):
         sv = bpy.context.scene.home_builder.wall_distance_snap_value
