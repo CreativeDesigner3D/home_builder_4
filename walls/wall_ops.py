@@ -86,10 +86,17 @@ class home_builder_OT_draw_multiple_walls(pc_snap.Drop_Operator):
     ht_cancel_command = "(RIGHT CLICK or ESC = Exit Command)"
     ht_close_room = "(C = Close Room)"
     ht_set_angle = "(HOLD ALT = Set Angle)"
-    ht_type_numbers = "(Type numbers to set wall Length)"
     ht_start = ht_start_command + ht_space + ht_cancel_command
-    ht_second_click = ht_next_click_command + ht_space + ht_type_numbers + ht_space + ht_set_angle + ht_space + ht_cancel_command
-    ht_forth_click = ht_next_click_command + ht_space + ht_close_room + ht_space + ht_type_numbers + ht_space + ht_set_angle + ht_space + ht_cancel_command
+
+    def ht_forth_click(self):
+        ht_type_numbers = f"(Type numbers to set wall Length): {self.typed_value}"
+        message = self.ht_next_click_command + self.ht_space + self.ht_close_room + self.ht_space + ht_type_numbers + self.ht_space + self.ht_set_angle + self.ht_space + self.ht_cancel_command
+        return message
+
+    def ht_second_click(self):
+        ht_type_numbers = f"(Type numbers to set wall Length): {self.typed_value}"
+        message = self.ht_next_click_command + self.ht_space + ht_type_numbers + self.ht_space + self.ht_set_angle + self.ht_space + self.ht_cancel_command
+        return message
 
     def reset_properties(self):
         self.current_wall = None
@@ -274,9 +281,9 @@ class home_builder_OT_draw_multiple_walls(pc_snap.Drop_Operator):
         else:
             self.dim.obj.hide_viewport = False
             if number_of_walls > 1:
-                context.workspace.status_text_set(text=self.ht_forth_click)
+                context.workspace.status_text_set(text=self.ht_forth_click())
             else:
-                context.workspace.status_text_set(text=self.ht_second_click)
+                context.workspace.status_text_set(text=self.ht_second_click())
 
         if self.starting_point == () and connected_wall_bp:
             previous_wall = pc_types.Assembly(connected_wall_bp)
@@ -310,11 +317,11 @@ class home_builder_OT_draw_multiple_walls(pc_snap.Drop_Operator):
                 if dist < self.distance_to_snap_to_end:
                     self.previous_wall = previous_wall
                     self.connect_walls()
-                self.typed_value = ""                
+                self.typed_value = ""
             return {'RUNNING_MODAL'}
-            
+
         if self.event_is_place_next_point(event):
-            context.workspace.status_text_set(text=self.ht_second_click)
+            context.workspace.status_text_set(text=self.ht_second_click())
             pc_utils.delete_object_and_children(self.dim.obj)
             self.set_placed_properties(self.current_wall.obj_bp)
             self.create_wall()
