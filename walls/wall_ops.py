@@ -501,8 +501,8 @@ class home_builder_OT_draw_multiple_walls(pc_snap.Drop_Operator):
 
         start_time = time.time()
         for obj in self.obj_wall_meshes:
-            # if not obj.hide_viewport:
-            #     hb_utils.unwrap_obj(context,obj)
+            if not obj.hide_viewport:
+                hb_utils.unwrap_obj(context,obj)
             self.hide_empties(obj.parent)
         print("Wall Unwrap: Draw Time --- %s seconds ---" % (time.time() - start_time))
 
