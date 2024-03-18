@@ -1,6 +1,7 @@
 '''
 Common Unit Conversion Functions
 '''
+import re
 import bpy
 from decimal import *
 
@@ -84,3 +85,17 @@ def unit_to_string(unit_settings,value):
             return str(round(meter_to_inch(value),4)) + '"'
     else:
         return str(round(value,4))
+
+def parse_feet_and_inches(input_str):
+    # Define a regular expression pattern to match feet and inches notation with optional parts
+    pattern = re.compile(r'^(?:(?P<feet>\d+)\')?(?:(?P<inches>\d+)\"?)?$')
+
+    # Use regular expression to extract feet and inches
+    match = pattern.match(input_str)
+
+    if match:
+        feet = int(match.group('feet')) if match.group('feet') else 0
+        inches = int(match.group('inches')) if match.group('inches') else 0
+        return feet, inches
+    else:
+        raise ValueError(f"Invalid input format. Please use the format X'Y\" or X' or Y\". Got {input_str}")
