@@ -182,6 +182,15 @@ def draw_object_properties(context,layout,obj):
 
 
     if obj.pyclone.object_tabs == 'DATA':
+        box = layout.box()
+        row = box.row()
+        row.label(text="Machining",icon='TOOL_SETTINGS')
+        row.menu('MACHINE_TOKENS_MT_add_machine_token',text="Add Machine Token")
+
+        machine_tokens = pc_types.MachineTokens(obj)
+        for token in machine_tokens.machine_tokens:
+            token.draw_token(box)    
+                
         if obj.type == 'MESH':
             layout.label(text="Edit Mode Options",icon='EDITMODE_HLT')
             if obj.mode == 'EDIT':

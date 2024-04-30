@@ -21,6 +21,7 @@ from .pyclone_ops import pc_driver
 from .pyclone_ops import pc_general
 from .pyclone_ops import pc_layout_view
 from .pyclone_ops import pc_library
+from .pyclone_ops import pc_machine_tokens
 from .pyclone_ops import pc_material
 from .pyclone_ops import pc_object
 from .pyclone_ops import pc_prompts
@@ -110,6 +111,7 @@ def register():
     pc_general.register()
     pc_layout_view.register()
     pc_library.register()
+    pc_machine_tokens.register()
     pc_material.register()
     pc_object.register()
     pc_prompts.register()
@@ -139,6 +141,7 @@ def unregister():
     pc_general.unregister()
     pc_layout_view.unregister()
     pc_library.unregister()
+    pc_machine_tokens.unregister()
     pc_material.unregister()
     pc_object.unregister()
     pc_prompts.unregister()

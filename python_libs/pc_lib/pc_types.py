@@ -1105,6 +1105,87 @@ class Annotation(Assembly):
         row.prop(self.obj_text.pyclone,'flip_x',text="X")            
         row.prop(self.obj_text.pyclone,'flip_y',text="Y")     
         
+class MachineTokens():
+
+    obj = None
+    machine_tokens = []
+
+    def __init__(self,obj=None):
+        self.machine_tokens = []
+        if obj:
+            self.obj = obj
+            for mod in obj.modifiers:
+                if mod.type == 'NODES':
+                    node = mod.node_group
+                    if 'PCMT_' in node.name:
+                        self.machine_tokens.append(MachineToken(obj,mod))
+
+class MachineToken():
+    
+    obj = None
+    mod = None
+    node_group = None
+
+    def __init__(self,obj=None,mod=None):
+        if obj:
+            self.obj = obj
+            if mod:
+                self.mod = mod
+                self.node_group = mod.node_group
+
+    def get_token_node(self,token_type):
+        path = pc_utils.get_machine_tokens_path()
+        token_path = os.path.join(path,token_type + ".blend")
+
+        if token_type in bpy.data.node_groups:
+            return bpy.data.node_groups[token_type]
+
+        if os.path.exists(token_path):
+
+            with bpy.data.libraries.load(token_path) as (data_from, data_to):
+                for ng in data_from.node_groups:
+                    if ng == token_type:
+                        data_to.node_groups = [ng]
+                        break    
+            
+            for ng in data_to.node_groups:
+                return ng
+            
+    def add_token(self,token_type,token_name):
+        node_group = self.get_token_node(token_type)
+        self.mod = self.obj.modifiers.new(name=token_name,type='NODES')
+        self.mod.node_group = node_group
+        self.mod.show_expanded = False
+        self.mod.show_viewport = False
+        self.mod.show_render = False
+    
+    def set_input(self,name,value=None):
+        if name in self.mod.node_group.interface.items_tree:
+            node_input = self.mod.node_group.interface.items_tree[name]    
+            self.mod.node_group.interface_update(bpy.context)
+            if hasattr(node_input,'subtype'):
+                node_input.subtype = node_input.subtype            
+            exec('self.mod["' + node_input.identifier + '"] = value')       
+
+    def get_input(self,name):
+        if name in self.mod.node_group.interface.items_tree:
+            node_input = self.mod.node_group.interface.items_tree[name]
+            return eval('self.mod["' + node_input.identifier + '"]')
+        
+    def draw_token(self,layout):
+        token_type = self.node_group.name.replace("PCMT_","")
+        t_box = layout.box()
+        row = t_box.row()
+        row.prop(self.mod,'show_expanded',text="",emboss=False)
+        row.label(text=token_type)
+        row.prop(self.mod,'name',text="")
+        row.prop(self.mod,'show_viewport',text="",emboss=False)
+        row.operator('machine_tokens.remove_machine_token',text="",icon='X',emboss=False).modifier_name = self.mod.name
+        if self.mod.show_expanded:
+            for n_input in self.node_group.interface.items_tree:
+                if n_input.identifier in self.mod:
+                    t_box.prop(self.mod,'["' + n_input.identifier + '"]',text=n_input.name)
+
 
 class GeoNodeObject():
 

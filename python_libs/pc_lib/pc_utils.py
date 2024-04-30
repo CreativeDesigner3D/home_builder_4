@@ -498,3 +498,6 @@ def get_geo_node_path():
 def get_dimension_material():
     path = os.path.join(os.path.dirname(__file__),'assets','Materials','library.blend')
     return get_material(path,'Dimension')
+
+def get_machine_tokens_path():
+    return os.path.join(os.path.dirname(__file__),'assets','Machine Tokens')
