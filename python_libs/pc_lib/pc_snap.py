@@ -330,6 +330,11 @@ class Drop_Operator(bpy.types.Operator):
             if event.type == 'BACK_SPACE':
                 if self.typed_value != "":
                     self.typed_value = self.typed_value[:-1]
+            if event.type == 'QUOTE':
+                if event.shift:
+                    self.typed_value += '"'
+                else:
+                    self.typed_value += "'"
 
     def set_placed_properties(self,obj):
         if obj.type == 'MESH' and 'IS_OPENING_MESH' not in obj:
