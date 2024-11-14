@@ -139,7 +139,7 @@ class Home_Builder_Scene_Props(PropertyGroup):
     wall_thickness: FloatProperty(name="Wall Thickness",default=pc_unit.inch(6),subtype='DISTANCE')
 
     wall_distance_snap_value: FloatProperty(name="Wall Distance Snap Value",default=pc_unit.inch(1),subtype='DISTANCE')
-    wall_angle_snap_value: FloatProperty(name="Wall Angle Snap Value",default=math.radians(45),subtype='ANGLE')
+    wall_angle_snap_value: FloatProperty(name="Wall Angle Snap Value",default=math.radians(15),subtype='ANGLE')
 
     is_elevation_view: BoolProperty(name="Is Elevation View",default=False)
     view_rotation: FloatVectorProperty(name="View Rotation",size=4)
