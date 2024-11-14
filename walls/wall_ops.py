@@ -436,7 +436,7 @@ class home_builder_OT_draw_multiple_walls(pc_snap.Drop_Operator):
             parent_rot = self.current_wall.obj_bp.parent.rotation_euler.z if self.current_wall.obj_bp.parent else 0
 
             if set_angle:
-                dist = pc_utils.calc_distance(self.starting_point, (x,y,0))
+                dist = pc_utils.calc_distance(self.starting_point, (selected_point[0],selected_point[1],0))
                 self.set_wall_length(dist)
                 if dist != 0 and x != 0:
                     asin_value = y/dist
