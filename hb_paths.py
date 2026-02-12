@@ -10,7 +10,8 @@ def get_library_path_xml():
     return os.path.join(path,"home_builder_paths.xml")
 
 def get_project_folder_path():
-    return os.path.expanduser('~\\Documents\\Home_Builder_Projects')
+    home = os.path.expanduser('~')
+    return os.path.join(home, 'Documents', 'Home_Builder_Projects')
 
 def get_built_in_asset_path():
     return os.path.join(os.path.dirname(__file__),'assets')
